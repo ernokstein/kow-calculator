@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { getKillChance } from "@/scripts/chances.js";
+import { getAllOutputs } from "@/scripts/chances.js";
 import InputsAttackedSide from "@/components/InputsAttackedSide.vue";
 import InputsAttacker from "@/components/InputsAttacker.vue";
 import InputsDefender from "@/components/InputsDefender.vue";
@@ -52,8 +52,12 @@ export default {
     },
     attackedSide: "front",
     outputs: {
-      weaverChance: 0,
-      routChance: 0
+      hitsChanceTable: [],
+      dmgChanceTable: [],
+      killChance: {
+        weaverChance: 0,
+        routChance: 0
+      }
     }
   }),
   mounted() {
@@ -102,7 +106,7 @@ export default {
       weaver += totalNerveModifiation;
       rout += totalNerveModifiation;
 
-      this.outputs = getKillChance(
+      this.outputs = getAllOutputs(
         { att, me, elite, vicious },
         { de, ne: { weaver, rout }, inspired }
       );
@@ -118,13 +122,13 @@ export default {
   margin: 0 auto;
   display: grid;
   grid-template-areas:
-    "title title"
-    "attacker defender"
-    "attacked-side attacked-side"
-    "calculate calculate"
-    "outputs outputs";
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-gap: 50px;
+    "title title title"
+    "attacker attacked-side defender"
+    "calculate calculate calculate"
+    "outputs outputs outputs";
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  row-gap: 20px;
+  column-gap: 50px;
 }
 #title {
   grid-area: title;

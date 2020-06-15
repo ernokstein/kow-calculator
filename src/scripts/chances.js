@@ -60,10 +60,8 @@ export function getDmgChanceTableByHits(maxHits, de, vicious) {
   return dmgChanceTableByHits
 }
 
-/// ({ att: number, me: number, elite, vicious }, { de: number }) -> [number]
-export function getDmgChanceTable(attacker, defender) {
-  const hitsChanceTable = getSucessChanceTable(attacker.att, attacker.me, attacker.elite)
-
+/// ([number], { att: number, me: number, elite, vicious }, { de: number }) -> [number]
+export function getDmgChanceTable(hitsChanceTable, attacker, defender) {
   const maxHits = hitsChanceTable.length - 1
   const dmgChanceTableByHits = getDmgChanceTableByHits(maxHits, defender.de, attacker.vicious)
 
@@ -113,9 +111,8 @@ export function getNerveChance(ne, dmg, inspired) {
   }
 }
 
-/// ({ att, me, elite, vicious }, { de, ne: { weaver, rout }, inspired: boolean }) -> { weaverChance, routChance}
-export function getKillChance(attacker, defender) {
-  const dmgChanceTable = getDmgChanceTable(attacker, defender)
+/// ([number], { de, ne: { weaver, rout }, inspired: boolean }) -> { weaverChance, routChance}
+export function getKillChance(dmgChanceTable, defender) {
   const nerveChanceByDmg = dmgChanceTable.map((_, dmg) => 
     dmg === 0 
       ? { weaverChance: 0, routChance: 0} 
@@ -130,4 +127,12 @@ export function getKillChance(attacker, defender) {
     totalNerveChance.weaverChance += nerveChanceByDmg[dmg].weaverChance * dmgChanceTable[dmg]
   }
   return totalNerveChance
+}
+
+/// ({ att, me, elite, vicious }, { de, ne: { weaver, rout }, inspired: boolean }) -> { hitsChanceTable, dmgChanceTable, killChance }
+export function getAllOutputs(attacker, defender) {
+  const hitsChanceTable = getSucessChanceTable(attacker.att, attacker.me, attacker.elite)
+  const dmgChanceTable = getDmgChanceTable(hitsChanceTable, attacker, defender)
+  const killChance = getKillChance(dmgChanceTable, defender)
+  return { hitsChanceTable, dmgChanceTable, killChance }
 }
