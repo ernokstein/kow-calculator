@@ -1,6 +1,6 @@
 <template>
   <form class="home">
-    <h1 id="title">KoW Calculator</h1>
+    <h1 id="title">KoW Calculator 0.1</h1>
 
     <InputsAttacker v-model="attacker"></InputsAttacker>
 
