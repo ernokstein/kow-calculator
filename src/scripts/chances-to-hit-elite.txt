@@ -1,0 +1,106 @@
+chance of 0 hits elite =
+  chance of 0 hits * chance of 0 reroll hits on 4 misses
+
+chance of 1 hits elite =
+  chance of 0 hits * chance of 1 reroll hits on 4 misses
+  chance of 1 hits * chance of 0 reroll hits on 3 misses
+  
+chance of 2 hits elite =
+  chance of 0 hits * chance of 2 reroll hits on 4 misses
+  chance of 1 hits * chance of 1 reroll hits on 3 misses
+  chance of 2 hits * chance of 0 reroll hits on 2 misses
+  
+chance of 3 hits elite =
+  chance of 0 hits * chance of 3 reroll hits on 4 misses
+  chance of 1 hits * chance of 2 reroll hits on 3 misses
+  chance of 2 hits * chance of 1 reroll hits on 2 misses
+  chance of 3 hits * chance of 0 reroll hits on 1 misses
+  
+chance of 4 hits elite =
+  chance of 0 hits * chance of 4 reroll hits on 4 misses
+  chance of 1 hits * chance of 3 reroll hits on 3 misses
+  chance of 2 hits * chance of 2 reroll hits on 2 misses
+  chance of 3 hits * chance of 1 reroll hits on 1 misses
+  chance of 4 hits * chance of 0 reroll hits on 0 misses
+
+
+chance of H hits elite =
+  for NORMAL_HITS = 0 to <= H
+    let MISSES = ATT - NORMAL_HITS
+    let REROLL_HITS = H - NORMAL_HITS
+    chance of NORMAL_HITS hits * chance of REROLL_HITS reroll hits on MISSES misses
+
+
+chance of RH reroll hits on M misses =
+  for ONES = RH to <= M
+    chance of ONES ones on M dices * chance of RH hits on ONES dice
+
+
+chance of 0 reroll hits on 4 misses =
+  chance of 0 ones on 4 misses
+  chance of 1 ones on 4 misses * chance of 0 hits on 1 dice
+  chance of 2 ones on 4 misses * chance of 0 hits on 2 dice
+  chance of 3 ones on 4 misses * chance of 0 hits on 3 dice
+  chance of 4 ones on 4 misses * chance of 0 hits on 4 dice
+
+chance of 1 reroll hits on 4 misses =
+  chance of 1 ones on 4 misses * chance of 1 hits on 1 dice
+  chance of 2 ones on 4 misses * chance of 1 hits on 2 dice
+  chance of 3 ones on 4 misses * chance of 1 hits on 3 dice
+  chance of 4 ones on 4 misses * chance of 1 hits on 4 dice
+
+chance of 2 reroll hits on 4 misses =
+  chance of 2 ones on 4 misses * chance of 2 hits on 2 dice
+  chance of 3 ones on 4 misses * chance of 2 hits on 3 dice
+  chance of 4 ones on 4 misses * chance of 2 hits on 4 dice
+
+chance of 3 reroll hits on 4 misses =
+  chance of 3 ones on 4 misses * chance of 3 hits on 3 dice
+  chance of 4 ones on 4 misses * chance of 3 hits on 4 dice
+
+chance of 4 reroll hits on 4 misses =
+  chance of 4 ones on 4 misses * chance of 4 hits on 4 dice
+
+chance of 0 reroll hits on 3 misses =
+  chance of 0 ones on 3 misses
+  chance of 1 ones on 3 misses * chance of 0 hits on 1 dice
+  chance of 2 ones on 3 misses * chance of 0 hits on 2 dice
+  chance of 3 ones on 3 misses * chance of 0 hits on 3 dice
+
+chance of 1 reroll hits on 3 misses =
+  chance of 1 ones on 3 misses * chance of 1 hits on 1 dice
+  chance of 2 ones on 3 misses * chance of 1 hits on 2 dice
+  chance of 3 ones on 3 misses * chance of 1 hits on 3 dice
+
+chance of 2 reroll hits on 3 misses =
+  chance of 2 ones on 3 misses * chance of 2 hits on 2 dice
+  chance of 3 ones on 3 misses * chance of 2 hits on 3 dice
+
+chance of 3 reroll hits on 3 misses =
+  chance of 3 ones on 3 misses * chance of 3 hits on 3 dice
+
+chance of 0 reroll hits on 2 misses =
+  chance of 0 ones on 2 misses
+  chance of 1 ones on 2 misses * chance of 0 hits on 1 dice
+  chance of 2 ones on 2 misses * chance of 0 hits on 2 dice
+
+chance of 1 reroll hits on 2 misses =
+  chance of 1 ones on 2 misses * chance of 1 hits on 1 dice
+  chance of 2 ones on 2 misses * chance of 1 hits on 2 dice
+
+chance of 2 reroll hits on 2 misses =
+  chance of 2 ones on 2 misses * chance of 2 hits on 2 dice
+
+chance of 0 reroll hits on 1 misses =
+  chance of 0 ones on 1 misses
+  chance of 1 ones on 1 misses * chance of 0 hits on 1 dice
+
+chance of 1 reroll hits on 1 misses =
+  chance of 1 ones on 1 misses * chance of 1 hits on 1 dice
+
+chance of 0 reroll hits on 0 misses =
+  1
+
+
+chance of ONES ones on M misses =
+

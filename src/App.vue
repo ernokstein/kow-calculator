@@ -4,9 +4,24 @@
   </div>
 </template>
 
+<script>
+// function addScriptToHead(src) {
+//   let scriptElem = document.createElement("script");
+//   scriptElem.setAttribute("src", src);
+//   document.head.appendChild(scriptElem);
+// }
+
+// export default {
+//   mounted() {
+//     addScriptToHead("https://cdn.jsdelivr.net/npm/apexcharts");
+//   }
+// };
+</script>
+
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, serif;
+  font-family: serif;
+  font-size: 1.2em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

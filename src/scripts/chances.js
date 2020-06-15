@@ -1,110 +1,140 @@
-export function fact(n) {
-  if (n <= 1) {
-    return 1;
-  } else {
-    return fact(n - 1) * n;
-  }
-}
-export function sum(array) {
-  return array.reduce((a, b) => a + b, 0);
-}
-export function range(n) {
-  return Array(n).keys();
-}
-export function range_incl(n) {
-  return Array(n + 1).keys();
-}
-export function range_from_incl(from, to) {
-  return [...Array(to - from + 1).keys()].map((_, i) => i + from);
+import { fact, rangeFromIncl, rangeIncl, sum } from './utils.js'
+
+/// (number, number, number) -> number
+export function getExactSuccessResultChance(dice, probSuccess, successes) {
+  const probMiss = 1 - probSuccess
+  const misses = dice - successes
+  const a = fact(dice) / fact(successes) / fact(misses)
+  const b = probSuccess ** successes * probMiss ** misses
+  return a * b
 }
 
 /// (number, number, number) -> number
-export function get_dice_successes_chance(dices, required, successes) {
-  const misses = dices - successes;
-  const a = fact(dices) / fact(successes) / fact(misses);
-  const b = ((7 - required) / 6) ** successes * ((required - 1) / 6) ** misses;
-  return a * b;
+export function getExactRollResultChance(dice, minRequired, successes) {
+  return getExactSuccessResultChance(dice, (7 - minRequired) / 6 , successes)
 }
 
-/// (number, number) -> [number]
-export function get_success_chance_table(att, me) {
-  const hits_chance_table = [];
-  for (let hits of range_incl(att)) {
-    hits_chance_table[hits] = get_dice_successes_chance(att, me, hits);
+/// (number, number, boolean) -> [number]
+export function getSucessChanceTable(att, me, rerollOnes) {
+  const normalSuccessChanceTable = []
+  for (let hits of rangeIncl(att)) {
+    normalSuccessChanceTable[hits] = getExactRollResultChance(att, me, hits)
   }
-  return hits_chance_table;
+  if (rerollOnes) {
+    const successChanceTableWithRerolls = []
+    for (const hits of rangeIncl(att)) {
+      let chance = 0
+      for (const normalHits of rangeIncl(hits)) {
+        const requiredRerollHits = hits - normalHits
+        const missedDice = att - normalHits
+        chance +=
+            normalSuccessChanceTable[normalHits] * 
+            getChanceOfExactRerollHits(me, requiredRerollHits, missedDice)
+      }
+      successChanceTableWithRerolls[hits] = chance
+    }
+    return successChanceTableWithRerolls
+  } else {
+    return normalSuccessChanceTable
+  }
+}
+
+/// (number, number) -> number
+function getChanceOfExactRerollHits(me, rerollHits, missedDice) {
+  const probOne = 1 / (me - 1) // die that already missed
+  let chance = 0
+  for (const ones of rangeFromIncl(rerollHits, missedDice)) {
+    chance +=
+        getExactSuccessResultChance(missedDice, probOne, ones) *
+        getExactRollResultChance(ones, me, rerollHits)
+  }
+  return chance
 }
 
 /// (number, number) -> [[number]]
-export function get_dmg_chance_table_by_hits(max_hits, de) {
-  const dmg_chance_table_by_hits = [];
-  for (let hits of range_incl(max_hits)) {
-    dmg_chance_table_by_hits[hits] = get_success_chance_table(hits, de);
+export function getDmgChanceTableByHits(maxHits, de, vicious) {
+  const dmgChanceTableByHits = []
+  for (let hits of rangeIncl(maxHits)) {
+    dmgChanceTableByHits[hits] = getSucessChanceTable(hits, de, vicious)
   }
-  return dmg_chance_table_by_hits;
+  return dmgChanceTableByHits
 }
 
-/// (number, number, number) -> [number]
-export function get_dmg_chance_table(att, me, de) {
-  const hits_chance_table = get_success_chance_table(att, me);
+/// ({ att: number, me: number, elite, vicious }, { de: number }) -> [number]
+export function getDmgChanceTable(attacker, defender) {
+  const hitsChanceTable = getSucessChanceTable(attacker.att, attacker.me, attacker.elite)
 
-  const max_hits = hits_chance_table.length - 1;
-  const dmg_chance_table_by_hits = get_dmg_chance_table_by_hits(max_hits, de);
+  const maxHits = hitsChanceTable.length - 1
+  const dmgChanceTableByHits = getDmgChanceTableByHits(maxHits, defender.de, attacker.vicious)
 
-  const final_dmg_chance_table = [];
-  for (let hits of dmg_chance_table_by_hits.keys()) {
-    const hits_chance = hits_chance_table[hits];
-    const dmg_chance_table = dmg_chance_table_by_hits[hits];
-    for (let dmg of dmg_chance_table.keys()) {
-      const dmg_chance = dmg_chance_table[dmg];
-      final_dmg_chance_table[dmg] = (final_dmg_chance_table[dmg] ?? 0) + dmg_chance * hits_chance;
+  const finalDmgChanceTable = []
+  for (let hits of dmgChanceTableByHits.keys()) {
+    const hitsChance = hitsChanceTable[hits]
+    const dmgChanceTable = dmgChanceTableByHits[hits]
+    for (let dmg of dmgChanceTable.keys()) {
+      const dmgChance = dmgChanceTable[dmg]
+      finalDmgChanceTable[dmg] = (finalDmgChanceTable[dmg] ?? 0) + dmgChance * hitsChance
     }
   }
-  return final_dmg_chance_table;
+  return finalDmgChanceTable
 }
 
 /// (number, number, number) -> number
-export function get_dmg_avg(att, me, de) {
-  return sum(get_dmg_chance_table(att, me, de).map((dmg, chance) => dmg * chance));
+export function getDmgAvg(att, me, de) {
+  return sum(getDmgChanceTable(att, me, de).map((dmg, chance) => dmg * chance))
 }
+
+const _2d6chanceTable = [0, 0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]
+  .map(posibilities => posibilities / 36)
+
+const _2d6orMoreChanceTable = [...rangeIncl(12)]
+  .map(orMore => sum(_2d6chanceTable.slice(orMore)))
 
 /// (number) -> number
-export function get_2d6_success_chance(required) {
+export function get2d6successChance(required) {
   if (required > 12) {
-    return 0;
+    return 0
   } else {
-    const number_chance_times_36 = [0, 0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1];
-    return sum(range_from_incl(required, 12).map((n) => number_chance_times_36[n])) / 36;
+    return _2d6orMoreChanceTable[required]
   }
 }
 
-/// ({ weaver: number, route: number }, number, boolean) -> { weaver_chance: number, route_chance: number }
-export function get_nerve_chance(ne, dmg, inspired) {
-  let route_chance = get_2d6_success_chance(Math.max(3, ne.route - dmg));
-  let weaver_chance = get_2d6_success_chance(Math.max(3, ne.weaver - dmg)) - route_chance;
-  if (ne.route - dmg > 12 && ne.weaver > 12) {
-    weaver_chance = get_2d6_success_chance(12);
+/// ({ weaver: number, rout: number }, number, boolean) -> { weaverChance: number, routChance: number }
+export function getNerveChance(ne, dmg, inspired) {
+  if (ne.weaver - dmg > 12) {
+    return {
+      routChance: 0,
+      weaverChance: get2d6successChance(12)
+    }
   }
+
+  let routChance = get2d6successChance(Math.max(3, ne.rout - dmg))
+  let weaverChance = get2d6successChance(Math.max(3, ne.weaver - dmg)) - routChance
   if (inspired) {
-    route_chance = route_chance ** 2;
-    weaver_chance = weaver_chance + route_chance * weaver_chance;
+    routChance = routChance ** 2
+    weaverChance = weaverChance + routChance * weaverChance
   }
   return {
-    route_chance,
-    weaver_chance,
-  };
-}
-/// ({ att, me }, { de, ne: { weaver, route }, inspired: boolean }) -> { weaver_chance, route_chance}
-export function get_kill_chance(attacker, defender) {
-  const dmg_chance_table = get_dmg_chance_table(attacker.att, attacker.me, defender.de);
-  const nerve_chance_by_dmg = dmg_chance_table.map((_, dmg) => get_nerve_chance(defender.ne, dmg, defender.inspired));
-  const total_nerve_chance = {
-    route_chance: 0,
-    weaver_chance: 0,
-  };
-  for (let dmg of nerve_chance_by_dmg.keys()) {
-    total_nerve_chance.route_chance += nerve_chance_by_dmg[dmg].route_chance * dmg_chance_table[dmg];
-    total_nerve_chance.weaver_chance += nerve_chance_by_dmg[dmg].weaver_chance * dmg_chance_table[dmg];
+    routChance,
+    weaverChance,
   }
-  return total_nerve_chance;
+}
+
+/// ({ att, me, elite, vicious }, { de, ne: { weaver, rout }, inspired: boolean }) -> { weaverChance, routChance}
+export function getKillChance(attacker, defender) {
+  const dmgChanceTable = getDmgChanceTable(attacker, defender)
+  const nerveChanceByDmg = dmgChanceTable.map((_, dmg) => 
+    dmg === 0 
+      ? { weaverChance: 0, routChance: 0} 
+      : getNerveChance(defender.ne, dmg, defender.inspired)
+  )
+  const totalNerveChance = {
+    routChance: 0,
+    weaverChance: 0,
+  }
+  for (let dmg of nerveChanceByDmg.keys()) {
+    totalNerveChance.routChance += nerveChanceByDmg[dmg].routChance * dmgChanceTable[dmg]
+    totalNerveChance.weaverChance += nerveChanceByDmg[dmg].weaverChance * dmgChanceTable[dmg]
+  }
+  return totalNerveChance
 }
