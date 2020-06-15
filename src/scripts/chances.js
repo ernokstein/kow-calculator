@@ -101,15 +101,8 @@ export function get2d6successChance(required) {
 
 /// ({ weaver: number, rout: number }, number, boolean) -> { weaverChance: number, routChance: number }
 export function getNerveChance(ne, dmg, inspired) {
-  if (ne.weaver - dmg > 12) {
-    return {
-      routChance: 0,
-      weaverChance: get2d6successChance(12)
-    }
-  }
-
   let routChance = get2d6successChance(Math.max(3, ne.rout - dmg))
-  let weaverChance = get2d6successChance(Math.max(3, ne.weaver - dmg)) - routChance
+  let weaverChance = get2d6successChance(Math.min(12, Math.max(3, ne.weaver - dmg))) - routChance
   if (inspired) {
     routChance = routChance ** 2
     weaverChance = weaverChance + routChance * weaverChance

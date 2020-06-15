@@ -7,21 +7,25 @@
 </template>
 
 <script>
-import ApexCharts from "apexcharts";
+import ApexCharts from "vue-apexcharts";
 
 export default {
   name: "ChartKillChance",
   components: {
     ApexCharts
   },
+  props: {
+    routChance: Number,
+    weaverChance: Number,
+    steadyChance: Number,
+  },
   data: () => ({
-    series: [44, 55, 13, 43, 22],
     chartOptions: {
       chart: {
         width: 380,
         type: "pie"
       },
-      labels: ["Team A", "Team B", "Team C", "Team D", "Team E"],
+      labels: ["Rout", "Weaver", "Steady"],
       responsive: [
         {
           breakpoint: 480,
@@ -36,6 +40,11 @@ export default {
         }
       ]
     }
-  })
+  }),
+  computed: {
+    series() {
+      return [this.routChance, this.weaverChance, this.steadyChance]
+    }
+  }
 };
 </script>

@@ -1,126 +1,33 @@
 <template>
-  <div class="home">
+  <form class="home">
     <h1 id="title">KoW Calculator</h1>
 
-    <div id="inputs-attacker" class="inputs">
-      <h3>Attacker</h3>
-      <label>
-        <span>Me</span>
-        <input type="number" v-model="attacker.me" />
-      </label>
-      <label>
-        <span>Att</span>
-        <input type="number" v-model="attacker.att" />
-      </label>
-      <br />
-      <label>
-        <span>Crushing Strength</span>
-        <input type="number" v-model="attacker.cs" />
-      </label>
-      <label>
-        <span>Thunderous Charge</span>
-        <input type="number" v-model="attacker.tc" />
-      </label>
-      <br />
-      <label>
-        <span>Elite</span>
-        <input type="checkbox" v-model="attacker.elite" />
-      </label>
-      <label>
-        <span>Vicious</span>
-        <input type="checkbox" v-model="attacker.vicious" />
-      </label>
-      <label>
-        <span>Brutal/Shattering</span>
-        <input type="checkbox" v-model="attacker.brutal" />
-      </label>
-      <br />
-      <label>
-        <span>Hindered</span>
-        <input type="checkbox" v-model="attacker.hindered" />
-      </label>
-      <label>
-        <span>Charge from hill</span>
-        <input type="checkbox" v-model="attacker.chargeFromHill" />
-      </label>
-    </div>
+    <InputsAttacker v-model="attacker"></InputsAttacker>
 
-    <div id="inputs-defender" class="inputs">
-      <h3>Defender</h3>
-      <label>
-        <span>De</span>
-        <input type="number" v-model="defender.de" />
-      </label>
-      <label id="inputs-defender-ne">
-        <span>Ne</span>
-        <input type="number" v-model="defender.ne.weaver" /> /
-        <input type="number" v-model="defender.ne.rout" />
-      </label>
-      <br />
-      <label>
-        <span>Previous Wounds</span>
-        <input type="number" v-model="defender.wounds" />
-      </label>
-      <label>
-        <span>Rallied</span>
-        <input type="number" v-model="defender.rallied" />
-      </label>
-      <br />
-      <label>
-        <span>Inspired</span>
-        <input type="checkbox" v-model="defender.inspired" />
-      </label>
-      <label>
-        <span>Ensnare/Stealthy</span>
-        <input type="checkbox" v-model="defender.ensnare" />
-      </label>
-    </div>
+    <InputsDefender v-model="defender"></InputsDefender>
 
-    <div id="attacked-side">
-      <h3>Attacked Side</h3>
-      <label>
-        <span>Front</span>
-        <input type="radio" id="front" value="front" v-model="attackedSide" />
-      </label>
-      <label>
-        <span>Flank</span>
-        <input type="radio" id="flank" value="flank" v-model="attackedSide" />
-      </label>
-      <label>
-        <span>Rear</span>
-        <input type="radio" id="rear" value="rear" v-model="attackedSide" />
-      </label>
-    </div>
+    <InputsAttackedSide v-model="attackedSide"></InputsAttackedSide>
 
-    <button id="calculate" type="button" @click="calculate">Calculate</button>
+    <button id="calculate" type="submit" @click.prevent="calculate">Calculate</button>
 
-    <div id="results" v-if="result">
-      <label>
-        <span>Rout probability</span>
-        <input v-model="displayedRoutProbability" />
-      </label>
-      <label>
-        <span>Weaver probability</span>
-        <input v-model="displayedWeaverProbability" />
-      </label>
-      <label>
-        <span>Steady probability</span>
-        <input v-model="displayedSteadyProbability" />
-      </label>
-
-      <ChartKillChance></ChartKillChance>
-    </div>
-  </div>
+    <Outputs v-model="outputs"></Outputs>
+  </form>
 </template>
 
 <script>
 import { getKillChance } from "@/scripts/chances.js";
-import ChartKillChance from "@/components/ChartKillChance.vue";
+import InputsAttackedSide from "@/components/InputsAttackedSide.vue";
+import InputsAttacker from "@/components/InputsAttacker.vue";
+import InputsDefender from "@/components/InputsDefender.vue";
+import Outputs from "@/components/Outputs.vue";
 
 export default {
   name: "Home",
   components: {
-    ChartKillChance
+    InputsAttackedSide,
+    InputsAttacker,
+    InputsDefender,
+    Outputs,
   },
   data: () => ({
     attacker: {
@@ -136,18 +43,22 @@ export default {
     },
     defender: {
       de: 4,
-      ne: { weaver: 13, rout: 15 },
+      neWeaver: 13,
+      neRout: 15 ,
       rallied: null,
       wounds: null,
       inspired: true,
       ensnare: false
     },
     attackedSide: "front",
-    result: {
+    outputs: {
       weaverChance: 0,
       routChance: 0
     }
   }),
+  mounted() {
+    this.calculate()
+  },
   methods: {
     calculate() {
       let att = +this.attacker.att;
@@ -155,8 +66,8 @@ export default {
       let elite = this.attacker.elite;
       let vicious = this.attacker.vicious;
       let de = +this.defender.de;
-      let weaver = +this.defender.ne.weaver;
-      let rout = +this.defender.ne.rout;
+      let weaver = +this.defender.neWeaver;
+      let rout = +this.defender.neRout;
       let inspired = this.defender.inspired;
 
       if (this.attackedSide === "flank") {
@@ -191,33 +102,16 @@ export default {
       weaver += totalNerveModifiation;
       rout += totalNerveModifiation;
 
-      this.result = getKillChance(
+      this.outputs = getKillChance(
         { att, me, elite, vicious },
         { de, ne: { weaver, rout }, inspired }
       );
     }
   },
-  computed: {
-    displayedRoutProbability() {
-      return displayedPercentage(this.result.routChance);
-    },
-    displayedWeaverProbability() {
-      return displayedPercentage(this.result.weaverChance);
-    },
-    displayedSteadyProbability() {
-      return displayedPercentage(
-        1 - this.result.routChance - this.result.weaverChance
-      );
-    }
-  }
 };
-
-function displayedPercentage(n) {
-  return (n * 100).toFixed(2) + " %";
-}
 </script>
 
-<style scoped>
+<style>
 .home {
   width: 100%;
   max-width: 800px;
@@ -228,20 +122,20 @@ function displayedPercentage(n) {
     "attacker defender"
     "attacked-side attacked-side"
     "calculate calculate"
-    "results results";
+    "outputs outputs";
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   grid-gap: 50px;
 }
 #title {
   grid-area: title;
 }
-#attacker {
+.inputs-attacker {
   grid-area: attacker;
 }
-#defender {
+.inputs-defender {
   grid-area: defender;
 }
-#attacked-side {
+.attacked-side {
   grid-area: attacked-side;
   width: fit-content;
   margin: 0 auto;
@@ -250,8 +144,8 @@ function displayedPercentage(n) {
   grid-area: calculate;
   font-size: 2em;
 }
-#results {
-  grid-area: results;
+.outputs {
+  grid-area: outputs;
 }
 .inputs {
   display: flex;
