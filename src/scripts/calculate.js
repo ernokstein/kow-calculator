@@ -1,6 +1,6 @@
 import { getSucessChanceTable,getDmgChanceTable,getKillChance } from './chances.js'
 
-/// ({ att, me, elite, vicious }, { de, ne: { weaver, rout }, inspired: boolean }) -> { hitsChanceTable, dmgChanceTable, killChance }
+/// ({ att, me, elite, vicious }, { de, ne: { waver, rout }, inspired: boolean }) -> { hitsChanceTable, dmgChanceTable, killChance }
 export function getAllOutputs(attacker, defender) {
   const hitsChanceTable = getSucessChanceTable(attacker.att, attacker.me, attacker.elite)
   const dmgChanceTable = getDmgChanceTable(hitsChanceTable, attacker, defender)
@@ -8,14 +8,14 @@ export function getAllOutputs(attacker, defender) {
   return { hitsChanceTable, dmgChanceTable, killChance }
 }
 
-/// ({ attacker: { att, me, elite, vicious }, defender: { de, neWeaver, neRout }, inspired }, charge: { attackedSide, hindered, chargeFromHill }) -> { hitsChanceTable, dmgChanceTable, killChance }
+/// ({ attacker: { att, me, elite, vicious }, defender: { de, neWaver, neRout }, inspired }, charge: { attackedSide, hindered, chargeFromHill }) -> { hitsChanceTable, dmgChanceTable, killChance }
 export function calculate(inputs) {
   let att = +inputs.attacker.att;
   let me = +inputs.attacker.me;
   let elite = inputs.attacker.elite;
   let vicious = inputs.attacker.vicious;
   let de = +inputs.defender.de;
-  let weaver = +inputs.defender.neWeaver;
+  let waver = +inputs.defender.neWaver;
   let rout = +inputs.defender.neRout;
   let inspired = inputs.defender.inspired;
 
@@ -48,11 +48,11 @@ export function calculate(inputs) {
     (inputs.attacker.brutal ? -1 : 0) +
     +inputs.defender.rallied +
     -inputs.defender.wounds;
-  weaver += totalNerveModifiation;
+  waver += totalNerveModifiation;
   rout += totalNerveModifiation;
 
   return getAllOutputs(
     { att, me, elite, vicious },
-    { de, ne: { weaver, rout }, inspired }
+    { de, ne: { waver, rout }, inspired }
   );
 }

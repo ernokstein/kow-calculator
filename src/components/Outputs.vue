@@ -5,7 +5,7 @@
     <ChartKillChanceVue
       class="kill-chance"
       :rout-chance="value.killChance.routChance"
-      :weaver-chance="value.killChance.weaverChance"
+      :waver-chance="value.killChance.waverChance"
       :steady-chance="steadyChance"
     ></ChartKillChanceVue>
 
@@ -31,9 +31,7 @@ export default {
   computed: {
     steadyChance() {
       return (
-        1 -
-        this.value.killChance.routChance -
-        this.value.killChance.weaverChance
+        1 - this.value.killChance.routChance - this.value.killChance.waverChance
       );
     }
   }

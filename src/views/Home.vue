@@ -41,7 +41,7 @@ export default {
       },
       defender: {
         de: 4,
-        neWeaver: 13,
+        neWaver: 13,
         neRout: 15,
         rallied: null,
         wounds: null,
@@ -58,7 +58,7 @@ export default {
       hitsChanceTable: [],
       dmgChanceTable: [],
       killChance: {
-        weaverChance: 0,
+        waverChance: 0,
         routChance: 0
       }
     }

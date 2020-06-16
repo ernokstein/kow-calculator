@@ -97,34 +97,34 @@ export function get2d6successChance(required) {
   }
 }
 
-/// ({ weaver: number, rout: number }, number, boolean) -> { weaverChance: number, routChance: number }
+/// ({ waver: number, rout: number }, number, boolean) -> { waverChance: number, routChance: number }
 export function getNerveChance(ne, dmg, inspired) {
   let routChance = get2d6successChance(Math.max(3, ne.rout - dmg))
-  let weaverChance = get2d6successChance(Math.min(12, Math.max(3, ne.weaver - dmg))) - routChance
+  let waverChance = get2d6successChance(Math.min(12, Math.max(3, ne.waver - dmg))) - routChance
   if (inspired) {
     routChance = routChance ** 2
-    weaverChance = weaverChance + routChance * weaverChance
+    waverChance = waverChance + routChance * waverChance
   }
   return {
     routChance,
-    weaverChance,
+    waverChance,
   }
 }
 
-/// ([number], { de, ne: { weaver, rout }, inspired: boolean }) -> { weaverChance, routChance}
+/// ([number], { de, ne: { waver, rout }, inspired: boolean }) -> { waverChance, routChance}
 export function getKillChance(dmgChanceTable, defender) {
   const nerveChanceByDmg = dmgChanceTable.map((_, dmg) => 
     dmg === 0 
-      ? { weaverChance: 0, routChance: 0} 
+      ? { waverChance: 0, routChance: 0} 
       : getNerveChance(defender.ne, dmg, defender.inspired)
   )
   const totalNerveChance = {
     routChance: 0,
-    weaverChance: 0,
+    waverChance: 0,
   }
   for (let dmg of nerveChanceByDmg.keys()) {
     totalNerveChance.routChance += nerveChanceByDmg[dmg].routChance * dmgChanceTable[dmg]
-    totalNerveChance.weaverChance += nerveChanceByDmg[dmg].weaverChance * dmgChanceTable[dmg]
+    totalNerveChance.waverChance += nerveChanceByDmg[dmg].waverChance * dmgChanceTable[dmg]
   }
   return totalNerveChance
 }

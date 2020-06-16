@@ -14,7 +14,7 @@ export default {
   },
   props: {
     routChance: Number,
-    weaverChance: Number,
+    waverChance: Number,
     steadyChance: Number
   },
   data: () => ({
@@ -22,7 +22,7 @@ export default {
       chart: {
         type: "pie"
       },
-      labels: ["Rout", "Weaver", "Steady"],
+      labels: ["Rout", "Waver", "Steady"],
       title: {
         text: "Kill chance"
       },
@@ -47,7 +47,7 @@ export default {
   }),
   computed: {
     series() {
-      return [this.routChance, this.weaverChance, this.steadyChance];
+      return [this.routChance, this.waverChance, this.steadyChance];
     }
   }
 };

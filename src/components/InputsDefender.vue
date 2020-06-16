@@ -8,7 +8,7 @@
     <label>
       <span>Ne</span>
       <div class="inputs-defender-ne">
-        <input type="number" :value="value.neWeaver" @input="update('neWeaver', $event)" /> /
+        <input type="number" :value="value.neWaver" @input="update('neWaver', $event)" /> /
         <input type="number" :value="value.neRout" @input="update('neRout', $event)" />
       </div>
     </label>
