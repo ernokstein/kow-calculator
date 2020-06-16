@@ -6,7 +6,6 @@
       class="kill-chance"
       :rout-chance="value.killChance.routChance"
       :waver-chance="value.killChance.waverChance"
-      :steady-chance="steadyChance"
     ></ChartKillChanceVue>
 
     <ChartExactHitsChanceVue class="hits-chance" :type="'hits'" :table="value.hitsChanceTable"></ChartExactHitsChanceVue>
@@ -27,13 +26,6 @@ export default {
   },
   props: {
     value: Object
-  },
-  computed: {
-    steadyChance() {
-      return (
-        1 - this.value.killChance.routChance - this.value.killChance.waverChance
-      );
-    }
   }
 };
 </script>

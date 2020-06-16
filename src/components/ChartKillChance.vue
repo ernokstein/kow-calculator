@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { displayedProbability } from "@/scripts/utils.js";
 import ApexCharts from "vue-apexcharts";
 
 export default {
@@ -14,8 +15,7 @@ export default {
   },
   props: {
     routChance: Number,
-    waverChance: Number,
-    steadyChance: Number
+    waverChance: Number
   },
   data: () => ({
     chartOptions: {
@@ -46,8 +46,15 @@ export default {
     }
   }),
   computed: {
+    steadyChance() {
+      return 1 - this.routChance - this.waverChance;
+    },
     series() {
-      return [this.routChance, this.waverChance, this.steadyChance];
+      const rc = displayedProbability(this.routChance);
+      const wc = displayedProbability(this.waverChance);
+      const sc = displayedProbability(this.steadyChance);
+      console.log(rc, wc, sc);
+      return [rc, wc, sc];
     }
   }
 };

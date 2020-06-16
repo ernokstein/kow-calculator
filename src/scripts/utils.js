@@ -129,3 +129,25 @@ export function rangeFromIncl(from, to) {
   console.assert(from <= to, { from, to })
   return [...Array(to - from + 1).keys()].map((_, i) => i + from)
 }
+export function displayedAverageHit(hitsTable) {
+  const avg = sum(hitsTable.map((chance, dmg) => chance * dmg))
+  return displayedProbability(avg)
+}
+export function displayedProbability(probability) {
+  return +(+probability * 100).toFixed(2)
+}
+export function findIdexOfMaxValue(list) {
+  if (list.length === 0) {
+    return null
+  } else {
+    let maxValue = list[0]
+    let indexOfMaxValue = 0
+    for (let i = 1; i < list.length; i++) {
+      if (list[i] > maxValue) {
+        maxValue = list[i]
+        indexOfMaxValue = i
+      }
+    }
+    return indexOfMaxValue
+  }
+}

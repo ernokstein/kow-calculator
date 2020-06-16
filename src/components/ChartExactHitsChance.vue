@@ -5,7 +5,11 @@
 </template>
 
 <script>
-import { sum } from "@/scripts/utils.js";
+import {
+  displayedAverageHit,
+  displayedProbability
+  // findIdexOfMaxValue
+} from "@/scripts/utils.js";
 import ApexCharts from "vue-apexcharts";
 
 export default {
@@ -30,10 +34,12 @@ export default {
       };
     },
     series() {
+      const fullData = this.table.map(displayedProbability);
+      // const indexOfMaxValue = findIdexOfMaxValue(fullData);
       return [
         {
           name: "probability",
-          data: this.table.map(n => (n * 100).toFixed(2))
+          data: fullData
         }
       ];
     }
@@ -45,9 +51,4 @@ export default {
     }
   }
 };
-
-function displayedAverageHit(hitsTable) {
-  const avg = sum(hitsTable.map((chance, dmg) => chance * dmg));
-  return +avg.toFixed(2);
-}
 </script>
