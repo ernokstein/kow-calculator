@@ -1,14 +1,16 @@
 <template>
-  <div class="inputs inputs-defender">
+  <div class="inputs-defender">
     <h3>Defender</h3>
     <label>
       <span>De</span>
       <input type="number" :value="value.de" @input="update('de', $event)" />
     </label>
-    <label id="inputs-defender-ne">
+    <label>
       <span>Ne</span>
-      <input type="number" :value="value.neWeaver" @input="update('neWeaver', $event)" /> /
-      <input type="number" :value="value.neRout" @input="update('neRout', $event)" />
+      <div class="inputs-defender-ne">
+        <input type="number" :value="value.neWeaver" @input="update('neWeaver', $event)" /> /
+        <input type="number" :value="value.neRout" @input="update('neRout', $event)" />
+      </div>
     </label>
     <br />
     <label>
@@ -45,8 +47,20 @@ export default {
       this.updateValue(key, event.target.checked);
     },
     updateValue(key, value) {
-      this.$emit('input', { ...this.value, [key]: value })
+      this.$emit("input", { ...this.value, [key]: value });
     }
   }
 };
 </script>
+
+<style scoped>
+.inputs-defender-ne {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: row;
+}
+.inputs-defender-ne input {
+  flex: 1;
+  width: 0;
+}
+</style>

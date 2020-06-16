@@ -128,11 +128,3 @@ export function getKillChance(dmgChanceTable, defender) {
   }
   return totalNerveChance
 }
-
-/// ({ att, me, elite, vicious }, { de, ne: { weaver, rout }, inspired: boolean }) -> { hitsChanceTable, dmgChanceTable, killChance }
-export function getAllOutputs(attacker, defender) {
-  const hitsChanceTable = getSucessChanceTable(attacker.att, attacker.me, attacker.elite)
-  const dmgChanceTable = getDmgChanceTable(hitsChanceTable, attacker, defender)
-  const killChance = getKillChance(dmgChanceTable, defender)
-  return { hitsChanceTable, dmgChanceTable, killChance }
-}

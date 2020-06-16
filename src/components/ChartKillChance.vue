@@ -1,8 +1,6 @@
 <template>
   <div class="chart-kill-chance">
-    <div id="chart">
-      <ApexCharts type="pie" width="380" :options="chartOptions" :series="series"></ApexCharts>
-    </div>
+    <ApexCharts :width="300" :options="chartOptions" :series="series"></ApexCharts>
   </div>
 </template>
 
@@ -17,33 +15,39 @@ export default {
   props: {
     routChance: Number,
     weaverChance: Number,
-    steadyChance: Number,
+    steadyChance: Number
   },
   data: () => ({
     chartOptions: {
       chart: {
-        width: 380,
         type: "pie"
       },
       labels: ["Rout", "Weaver", "Steady"],
-      responsive: [
-        {
-          breakpoint: 480,
-          options: {
-            chart: {
-              width: 200
-            },
-            legend: {
-              position: "bottom"
-            }
-          }
-        }
-      ]
+      title: {
+        text: "Kill chance"
+      },
+      legend: {
+        position: "top"
+      },
+      theme: {}
+      // responsive: [
+      //   {
+      //     breakpoint: 480,
+      //     options: {
+      //       chart: {
+      //         width: 200
+      //       },
+      //       legend: {
+      //         position: "bottom"
+      //       }
+      //     }
+      //   }
+      // ]
     }
   }),
   computed: {
     series() {
-      return [this.routChance, this.weaverChance, this.steadyChance]
+      return [this.routChance, this.weaverChance, this.steadyChance];
     }
   }
 };
