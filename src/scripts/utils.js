@@ -131,10 +131,13 @@ export function rangeFromIncl(from, to) {
 }
 export function displayedAverageHit(hitsTable) {
   const avg = sum(hitsTable.map((chance, dmg) => chance * dmg))
-  return displayedProbability(avg)
+  return displayedNumber(avg)
 }
 export function displayedProbability(probability) {
-  return +(+probability * 100).toFixed(2)
+  return displayedNumber((+probability) * 100)
+}
+export function displayedNumber(num) {
+  return +(num).toFixed(2)
 }
 export function findIdexOfMaxValue(list) {
   if (list.length === 0) {
