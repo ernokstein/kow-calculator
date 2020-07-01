@@ -123,11 +123,14 @@ export function range(n) {
   return Array(n).keys()
 }
 export function rangeIncl(n) {
-  return Array(n + 1).keys()
+  return [...Array(n + 1).keys()]
 }
 export function rangeFromIncl(from, to) {
-  console.assert(from <= to, { from, to })
-  return [...Array(to - from + 1).keys()].map((_, i) => i + from)
+  if (to < from) {
+    return []
+  } else {
+    return [...Array(to - from + 1).keys()].map((_, i) => i + from)
+  }
 }
 export function displayedAverageHit(hitsTable) {
   const avg = sum(hitsTable.map((chance, dmg) => chance * dmg))

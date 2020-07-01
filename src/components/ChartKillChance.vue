@@ -53,7 +53,6 @@ export default {
       const rc = displayedProbability(this.routChance);
       const wc = displayedProbability(this.waverChance);
       const sc = displayedProbability(this.steadyChance);
-      console.log(rc, wc, sc);
       return [rc, wc, sc];
     }
   }

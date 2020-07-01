@@ -31,6 +31,17 @@
       <span>Brutal/Shattering</span>
       <input type="checkbox" :value="value.brutal" @input="updateBool('brutal', $event)" />
     </label>
+    <br />
+    <label>
+      <span>Blast</span>
+      <input type="checkbox" :checked="value.hasBlast" @input="updateBool('hasBlast', $event)" />
+      <select :value="value.blastDie" @input="update('blastDie', $event)">
+        <option value="3">D3</option>
+        <option value="6">D6</option>
+      </select>
+      +
+      <input type="number" :value="value.blastPlus" @input="update('blastPlus', $event)" />
+    </label>
   </div>
 </template>
 

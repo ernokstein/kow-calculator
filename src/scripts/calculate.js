@@ -2,13 +2,13 @@ import { getSucessChanceTable,getDmgChanceTable,getKillChance } from './chances.
 
 /// ({ att, me, elite, vicious }, { de, ne: { waver, rout }, inspired: boolean }) -> { hitsChanceTable, dmgChanceTable, killChance }
 export function getAllOutputs(attacker, defender) {
-  const hitsChanceTable = getSucessChanceTable(attacker.att, attacker.me, attacker.elite)
+  const hitsChanceTable = getSucessChanceTable(attacker.att, attacker.me, attacker.elite, attacker.blast)
   const dmgChanceTable = getDmgChanceTable(hitsChanceTable, attacker, defender)
   const killChance = getKillChance(dmgChanceTable, defender)
   return { hitsChanceTable, dmgChanceTable, killChance }
 }
 
-/// ({ attacker: { att, me, elite, vicious }, defender: { de, neWaver, neRout }, inspired }, charge: { attackedSide, hindered, chargeFromHill }) -> { hitsChanceTable, dmgChanceTable, killChance }
+/// ({ attacker: { att, me, elite, vicious, blast { die, plus } }, defender: { de, neWaver, neRout }, inspired }, charge: { attackedSide, hindered, chargeFromHill }) -> { hitsChanceTable, dmgChanceTable, killChance }
 export function calculate(inputs) {
   let att = +inputs.attacker.att;
   let me = +inputs.attacker.me;
@@ -18,11 +18,9 @@ export function calculate(inputs) {
   let waver = +inputs.defender.neWaver;
   let rout = +inputs.defender.neRout;
   let inspired = inputs.defender.inspired;
-
-  if (inputs.charge.attackedSide === "flank") {
-    att *= 2;
-  } else if (inputs.charge.attackedSide === "rear") {
-    att *= 3;
+  let blast = inputs.attacker.hasBlast && {
+    die: +inputs.attacker.blastDie,
+    plus: +inputs.attacker.blastPlus
   }
 
   const toHitReduction =
@@ -52,7 +50,7 @@ export function calculate(inputs) {
   rout += totalNerveModifiation;
 
   return getAllOutputs(
-    { att, me, elite, vicious },
+    { att, me, elite, vicious, blast },
     { de, ne: { waver, rout }, inspired }
   );
 }

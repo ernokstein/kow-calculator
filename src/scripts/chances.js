@@ -14,29 +14,78 @@ export function getExactRollResultChance(dice, minRequired, successes) {
   return getExactSuccessResultChance(dice, (7 - minRequired) / 6 , successes)
 }
 
-/// (number, number, boolean) -> [number]
-export function getSucessChanceTable(att, me, rerollOnes) {
-  const normalSuccessChanceTable = []
-  for (let hits of rangeIncl(att)) {
-    normalSuccessChanceTable[hits] = getExactRollResultChance(att, me, hits)
-  }
+/// (number, number, boolean, { die, plus }) -> [number]
+export function getSucessChanceTable(att, me, rerollOnes, blast) {
+  let finalSuccessChanceTable = getBasicSuccessChaneTable(att, me)
   if (rerollOnes) {
-    const successChanceTableWithRerolls = []
-    for (const hits of rangeIncl(att)) {
-      let chance = 0
-      for (const normalHits of rangeIncl(hits)) {
-        const requiredRerollHits = hits - normalHits
-        const missedDice = att - normalHits
-        chance +=
-            normalSuccessChanceTable[normalHits] * 
-            getChanceOfExactRerollHits(me, requiredRerollHits, missedDice)
-      }
-      successChanceTableWithRerolls[hits] = chance
-    }
-    return successChanceTableWithRerolls
-  } else {
-    return normalSuccessChanceTable
+    finalSuccessChanceTable = applyRerollOnes(finalSuccessChanceTable, att, me)
   }
+  if (blast) {
+    finalSuccessChanceTable = applyBlast(finalSuccessChanceTable, att, blast)
+  }
+  return finalSuccessChanceTable
+}
+
+function getBasicSuccessChaneTable(att, me) {
+  const basicSuccessChaneTable = []
+  for (let hits of rangeIncl(att)) {
+    basicSuccessChaneTable[hits] = getExactRollResultChance(att, me, hits)
+  }
+  return basicSuccessChaneTable
+}
+
+function applyRerollOnes(normalSuccessChanceTable, att, me) {
+  const successChanceTableWithRerolls = []
+  for (const hits of rangeIncl(att)) {
+    let chance = 0
+    for (const normalHits of rangeIncl(hits)) {
+      const requiredRerollHits = hits - normalHits
+      const missedDice = att - normalHits
+      chance +=
+          normalSuccessChanceTable[normalHits] * 
+          getChanceOfExactRerollHits(me, requiredRerollHits, missedDice)
+    }
+    successChanceTableWithRerolls[hits] = chance
+  }
+  return successChanceTableWithRerolls
+}
+
+function applyBlast(normalSuccessChanceTable, att, blast) {
+  const maxBlastPossible = att * (blast.die + blast.plus)
+  const blastTable = Array(maxBlastPossible + 1).fill(0)
+  blastTable[0] = normalSuccessChanceTable[0]
+  for (const hits of rangeFromIncl(1, att)) {
+    const blastDiceSumTable = getDiceSumTable(hits, blast.die)
+    for (const blastDiceSum of blastDiceSumTable.keys()) {
+      const blastDiceSumChance = blastDiceSumTable[blastDiceSum]
+      blastTable[blastDiceSum + blast.plus * hits] += normalSuccessChanceTable[hits] * blastDiceSumChance
+    }
+  }
+  return blastTable
+}
+
+//// (number, number) -> [number]
+function getDiceSumTable(diceCount, diceMaxSide) {
+  if (diceCount <= 0) {
+    return [1]
+  }
+
+  const sides = rangeFromIncl(1, diceMaxSide)
+  let numerators = [1] // start at 0 dice; 100% of getting 0
+  const d = rangeFromIncl(1, diceCount)
+  for (const die of d) {
+    const maxSum = diceMaxSide * die
+    const newNumerators = Array(maxSum + 1).fill(0)
+    for (const i of numerators.keys()) {
+      for (const side of sides) {
+        const sum = i + side
+        newNumerators[sum] += numerators[i]
+      }
+    }
+    numerators = newNumerators
+  }
+  const denominator = diceMaxSide ** diceCount
+  return numerators.map(numerator => numerator / denominator)
 }
 
 /// (number, number) -> number
@@ -60,7 +109,7 @@ export function getDmgChanceTableByHits(maxHits, de, vicious) {
   return dmgChanceTableByHits
 }
 
-/// ([number], { att: number, me: number, elite, vicious }, { de: number }) -> [number]
+/// ([number], { att: number, me: number, elite, vicious, { die, plus } } }, { de: number }) -> [number]
 export function getDmgChanceTable(hitsChanceTable, attacker, defender) {
   const maxHits = hitsChanceTable.length - 1
   const dmgChanceTableByHits = getDmgChanceTableByHits(maxHits, defender.de, attacker.vicious)
@@ -82,18 +131,17 @@ export function getDmgAvg(att, me, de) {
   return sum(getDmgChanceTable(att, me, de).map((dmg, chance) => dmg * chance))
 }
 
-const _2d6chanceTable = [0, 0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]
-  .map(posibilities => posibilities / 36)
+const sum2d6chanceTable = getDiceSumTable(2, 6)
 
-const _2d6orMoreChanceTable = [...rangeIncl(12)]
-  .map(orMore => sum(_2d6chanceTable.slice(orMore)))
+const sum2d6orMoreChanceTable = [...rangeIncl(12)]
+  .map(orMore => sum(sum2d6chanceTable.slice(orMore)))
 
 /// (number) -> number
 export function get2d6successChance(required) {
   if (required > 12) {
     return 0
   } else {
-    return _2d6orMoreChanceTable[required]
+    return sum2d6orMoreChanceTable[required]
   }
 }
 

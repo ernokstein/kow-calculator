@@ -44,11 +44,14 @@ export default {
   display: grid;
   grid-auto-flow: column;
   grid-template-columns: max-content max-content max-content;
-  column-gap: 50px;
+  column-gap: 16px;
 }
 .inputs-panel {
   display: flex;
   flex-direction: column;
+  border: 1px solid #666;
+  border-radius: 8px;
+  padding: 16px;
 }
 label {
   display: flex;
@@ -62,5 +65,8 @@ label span {
 label input {
   flex: 1 1 50%;
   min-width: 0;
+}
+h3 {
+  margin-top: 0;
 }
 </style>

@@ -12,7 +12,6 @@
     <Inputs v-model="inputs"></Inputs>
 
     <button id="calculate" type="submit" @click.prevent="calculate">Calculate</button>
-
     <Outputs v-model="outputs"></Outputs>
   </form>
 </template>
@@ -31,13 +30,16 @@ export default {
   data: () => ({
     inputs: {
       attacker: {
-        att: 12,
-        me: 4,
+        att: 2,
+        me: 5,
         cs: null,
         tc: null,
         elite: false,
         vicious: false,
-        brutal: false
+        brutal: false,
+        hasBlast: true,
+        blastDie: "3",
+        blastPlus: null
       },
       defender: {
         de: 4,
