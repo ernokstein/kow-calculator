@@ -1,14 +1,14 @@
 import { getSucessChanceTable,getDmgChanceTable,getKillChance } from './chances.js'
 
-/// ({ att, me, elite, vicious }, { de, ne: { waver, rout }, inspired: boolean }) -> { hitsChanceTable, dmgChanceTable, killChance }
+/// ({ att, me, elite, vicious, rerollOneHitDie, rerollOneDmgDie }, { de, ne: { waver, rout }, inspired: boolean }) -> { hitsChanceTable, dmgChanceTable, killChance }
 export function getAllOutputs(attacker, defender) {
-  const hitsChanceTable = getSucessChanceTable(attacker.att, attacker.me, attacker.elite, attacker.blast)
+  const hitsChanceTable = getSucessChanceTable(attacker.att, attacker.me, attacker.elite, attacker.blast, attacker.rerollOneHitDie)
   const dmgChanceTable = getDmgChanceTable(hitsChanceTable, attacker, defender)
   const killChance = getKillChance(dmgChanceTable, defender)
   return { hitsChanceTable, dmgChanceTable, killChance }
 }
 
-/// ({ attacker: { att, me, elite, vicious, blast { die, plus } }, defender: { de, neWaver, neRout }, inspired }, charge: { attackedSide, hindered, chargeFromHill }) -> { hitsChanceTable, dmgChanceTable, killChance }
+/// ({ attacker: { att, me, elite, vicious, blast { die, plus }, rerollOneHitDie, rerollOneDmgDie }, defender: { de, neWaver, neRout }, inspired }, charge: { attackedSide, hindered, chargeFromHill }) -> { hitsChanceTable, dmgChanceTable, killChance }
 export function calculate(inputs) {
   let att = +inputs.attacker.att;
   let me = +inputs.attacker.me;
@@ -22,6 +22,8 @@ export function calculate(inputs) {
     die: +inputs.attacker.blastDie,
     plus: +inputs.attacker.blastPlus
   }
+  let rerollOneHitDie = inputs.attacker.rerollOneHitDie
+  let rerollOneDmgDie = inputs.attacker.rerollOneDmgDie
 
   const toHitReduction =
     (inputs.charge.hindered ? 1 : 0) +
@@ -50,7 +52,7 @@ export function calculate(inputs) {
   rout += totalNerveModifiation;
 
   return getAllOutputs(
-    { att, me, elite, vicious, blast },
+    { att, me, elite, vicious, blast, rerollOneHitDie, rerollOneDmgDie },
     { de, ne: { waver, rout }, inspired }
   );
 }

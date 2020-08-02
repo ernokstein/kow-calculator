@@ -11,41 +11,44 @@ import ApexCharts from "vue-apexcharts";
 export default {
   name: "ChartKillChance",
   components: {
-    ApexCharts
+    ApexCharts,
   },
   props: {
     routChance: Number,
-    waverChance: Number
+    waverChance: Number,
   },
-  data: () => ({
-    chartOptions: {
-      chart: {
-        type: "pie"
-      },
-      labels: ["Rout", "Waver", "Steady"],
-      title: {
-        text: "Kill chance"
-      },
-      legend: {
-        position: "top"
-      },
-      theme: {}
-      // responsive: [
-      //   {
-      //     breakpoint: 480,
-      //     options: {
-      //       chart: {
-      //         width: 200
-      //       },
-      //       legend: {
-      //         position: "bottom"
-      //       }
-      //     }
-      //   }
-      // ]
-    }
-  }),
   computed: {
+    title() {
+      return "Kill chance: " + displayedProbability(this.routChance);
+    },
+    chartOptions() {
+      return {
+        chart: {
+          type: "pie",
+        },
+        labels: ["Rout", "Waver", "Steady"],
+        title: {
+          text: this.title,
+        },
+        legend: {
+          position: "top",
+        },
+        theme: {},
+        // responsive: [
+        //   {
+        //     breakpoint: 480,
+        //     options: {
+        //       chart: {
+        //         width: 200
+        //       },
+        //       legend: {
+        //         position: "bottom"
+        //       }
+        //     }
+        //   }
+        // ]
+      };
+    },
     steadyChance() {
       return 1 - this.routChance - this.waverChance;
     },
@@ -54,7 +57,7 @@ export default {
       const wc = displayedProbability(this.waverChance);
       const sc = displayedProbability(this.steadyChance);
       return [rc, wc, sc];
-    }
-  }
+    },
+  },
 };
 </script>

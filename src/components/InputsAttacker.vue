@@ -28,6 +28,26 @@
       <input type="checkbox" :value="value.vicious" @input="updateBool('vicious', $event)" />
     </label>
     <label>
+      <span>
+        <TagBeta></TagBeta>Reroll 1 hit die
+      </span>
+      <input
+        type="checkbox"
+        :value="value.rerollOneHitDie"
+        @input="updateBool('rerollOneHitDie', $event)"
+      />
+    </label>
+    <label>
+      <span>
+        <TagBeta></TagBeta>Reroll 1 damage die
+      </span>
+      <input
+        type="checkbox"
+        :value="value.rerollOneDmgDie"
+        @input="updateBool('rerollOneDmgDie', $event)"
+      />
+    </label>
+    <label>
       <span>Brutal/Shattering</span>
       <input type="checkbox" :value="value.brutal" @input="updateBool('brutal', $event)" />
     </label>
@@ -46,10 +66,15 @@
 </template>
 
 <script>
+import TagBeta from "./TagBeta.vue";
+
 export default {
   name: "InputsAttacker",
+  components: {
+    TagBeta,
+  },
   props: {
-    value: Object
+    value: Object,
   },
   methods: {
     update(key, event) {
@@ -60,7 +85,7 @@ export default {
     },
     updateValue(key, value) {
       this.$emit("input", { ...this.value, [key]: value });
-    }
-  }
+    },
+  },
 };
 </script>

@@ -26,16 +26,16 @@ export default {
   components: {
     InputsAttacker,
     InputsDefender,
-    InputsCharge
+    InputsCharge,
   },
   props: {
-    value: Object
+    value: Object,
   },
   methods: {
     update(key, value) {
       this.$emit("input", { ...this.value, [key]: value });
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -58,9 +58,9 @@ label {
   flex-direction: row;
 }
 label span {
-  flex: 1 1 50%;
+  flex: 1 0 50%;
   text-align: end;
-  padding: 0 10px;
+  padding: 0 10px 0 0;
 }
 label input {
   flex: 1 1 50%;

@@ -14,11 +14,13 @@ export function getExactRollResultChance(dice, minRequired, successes) {
   return getExactSuccessResultChance(dice, (7 - minRequired) / 6 , successes)
 }
 
-/// (number, number, boolean, { die, plus }) -> [number]
-export function getSucessChanceTable(att, me, rerollOnes, blast) {
+/// (number, number, boolean, { die, plus }, boolean) -> [number]
+export function getSucessChanceTable(att, me, rerollOnes, blast, rerollOneDie) {
   let finalSuccessChanceTable = getBasicSuccessChaneTable(att, me)
   if (rerollOnes) {
-    finalSuccessChanceTable = applyRerollOnes(finalSuccessChanceTable, att, me)
+    finalSuccessChanceTable = applyRerollOnes(finalSuccessChanceTable, att, me, rerollOneDie)
+  } else if (rerollOneDie) {
+    finalSuccessChanceTable = applyRerollOneDie(finalSuccessChanceTable, att, me)
   }
   if (blast) {
     finalSuccessChanceTable = applyBlast(finalSuccessChanceTable, att, blast)
@@ -34,7 +36,7 @@ function getBasicSuccessChaneTable(att, me) {
   return basicSuccessChaneTable
 }
 
-function applyRerollOnes(normalSuccessChanceTable, att, me) {
+function applyRerollOnes(normalSuccessChanceTable, att, me, rerollOneDie) {
   const successChanceTableWithRerolls = []
   for (const hits of rangeIncl(att)) {
     let chance = 0
@@ -43,7 +45,26 @@ function applyRerollOnes(normalSuccessChanceTable, att, me) {
       const missedDice = att - normalHits
       chance +=
           normalSuccessChanceTable[normalHits] * 
-          getChanceOfExactRerollHits(me, requiredRerollHits, missedDice)
+          getChanceOfExactRerollHits(me, requiredRerollHits, missedDice, rerollOneDie)
+    }
+    successChanceTableWithRerolls[hits] = chance
+  }
+  return successChanceTableWithRerolls
+}
+
+function applyRerollOneDie(normalSuccessChanceTable, att, me) {
+  const successChanceTableWithRerolls = []
+  const rerollSuccess = (7 - me) / 6
+  const rerollFail = 1 - rerollSuccess
+  for (const hits of rangeIncl(att)) {
+    let chance = 0
+    if (hits > 0) {
+      chance += normalSuccessChanceTable[hits - 1] * rerollSuccess
+    }
+    if (hits < att) {
+      chance += normalSuccessChanceTable[hits] * rerollFail
+    } else {
+      chance += normalSuccessChanceTable[hits]
     }
     successChanceTableWithRerolls[hits] = chance
   }
@@ -89,30 +110,38 @@ function getDiceSumTable(diceCount, diceMaxSide) {
 }
 
 /// (number, number) -> number
-function getChanceOfExactRerollHits(me, rerollHits, missedDice) {
+function getChanceOfExactRerollHits(me, rerollHits, missedDice, rerollOneDie) {
   const probOne = 1 / (me - 1) // die that already missed
   let chance = 0
   for (const ones of rangeFromIncl(rerollHits, missedDice)) {
-    chance +=
-        getExactSuccessResultChance(missedDice, probOne, ones) *
-        getExactRollResultChance(ones, me, rerollHits)
+    let diceToReroll = ones
+    if (rerollOneDie) {
+      // increase by 1, but never more than missed dice
+      diceToReroll = Math.min(diceToReroll + 1, missedDice)
+    }
+
+    const a = getExactSuccessResultChance(missedDice, probOne, ones)
+    const b = getExactRollResultChance(diceToReroll, me, rerollHits)
+    const subChance = a * b
+
+    chance += subChance
   }
   return chance
 }
 
-/// (number, number) -> [[number]]
-export function getDmgChanceTableByHits(maxHits, de, vicious) {
+/// (number, number, boolean) -> [[number]]
+export function getDmgChanceTableByHits(maxHits, de, vicious, rerollOneDmgDie) {
   const dmgChanceTableByHits = []
   for (let hits of rangeIncl(maxHits)) {
-    dmgChanceTableByHits[hits] = getSucessChanceTable(hits, de, vicious)
+    dmgChanceTableByHits[hits] = getSucessChanceTable(hits, de, vicious, /* blast */ false, rerollOneDmgDie)
   }
   return dmgChanceTableByHits
 }
 
-/// ([number], { att: number, me: number, elite, vicious, { die, plus } } }, { de: number }) -> [number]
+/// ([number], { att: number, me: number, elite, vicious, { die, plus }, rerollOneDmgDie } }, { de: number }) -> [number]
 export function getDmgChanceTable(hitsChanceTable, attacker, defender) {
   const maxHits = hitsChanceTable.length - 1
-  const dmgChanceTableByHits = getDmgChanceTableByHits(maxHits, defender.de, attacker.vicious)
+  const dmgChanceTableByHits = getDmgChanceTableByHits(maxHits, defender.de, attacker.vicious, attacker.rerollOneDmgDie)
 
   const finalDmgChanceTable = []
   for (let hits of dmgChanceTableByHits.keys()) {

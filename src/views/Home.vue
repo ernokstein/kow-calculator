@@ -1,7 +1,7 @@
 <template>
   <form class="home">
     <div id="title">
-      <h1>KoW Calculator</h1>
+      <h1>Calkowlator</h1>
       <a
         href="https://github.com/ernokstein/kow-calculator"
         target="_BLANK"
@@ -25,21 +25,23 @@ export default {
   name: "Home",
   components: {
     Inputs,
-    Outputs
+    Outputs,
   },
   data: () => ({
     inputs: {
       attacker: {
-        att: 2,
-        me: 5,
+        att: 12,
+        me: 4,
         cs: null,
         tc: null,
         elite: false,
         vicious: false,
+        rerollOneHitDie: false,
+        rerollOneDmgDie: false,
         brutal: false,
-        hasBlast: true,
+        hasBlast: false,
         blastDie: "3",
-        blastPlus: null
+        blastPlus: null,
       },
       defender: {
         de: 4,
@@ -48,22 +50,22 @@ export default {
         rallied: null,
         wounds: null,
         inspired: true,
-        ensnare: false
+        ensnare: false,
       },
       charge: {
         attackedSide: "front",
         hindered: false,
-        chargeFromHill: false
-      }
+        chargeFromHill: false,
+      },
     },
     outputs: {
       hitsChanceTable: [],
       dmgChanceTable: [],
       killChance: {
         waverChance: 0,
-        routChance: 0
-      }
-    }
+        routChance: 0,
+      },
+    },
   }),
   mounted() {
     this.calculate();
@@ -78,8 +80,8 @@ export default {
         button.disabled = false;
         button.style.cursor = "";
       }, 1);
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -117,6 +119,7 @@ export default {
 h1 {
   text-align: start;
   margin: 0;
+  font-variant: small-caps;
 }
 a {
   margin: 0 10px;

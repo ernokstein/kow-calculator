@@ -21,6 +21,7 @@
 <style>
 body {
   margin: 0;
+  margin-bottom: 30px;
 }
 #app {
   font-family: serif;

@@ -22,11 +22,11 @@ export default {
   name: "Outputs",
   components: {
     ChartExactHitsChanceVue,
-    ChartKillChanceVue
+    ChartKillChanceVue,
   },
   props: {
-    value: Object
-  }
+    value: Object,
+  },
 };
 </script>
 
